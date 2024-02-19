@@ -1,0 +1,66 @@
+services:
+  db:
+    image: 'postgres'
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - 5432:5432
+    networks:
+      - app
+    volumes:
+      - db:/var/lib/postgresql/data
+
+  api:
+    build:
+      dockerfile: Dockerfile
+      target: dev
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db/postgres?sslmode=disable
+    ports:
+      - 5000:5000
+    depends_on:
+      - db
+    networks:
+      - app
+    volumes:
+      - ./:/opt/app/api
+
+  db-up: &basemigrate
+    profiles: ['tools']
+    image: migrate/migrate
+    entrypoint: 'migrate -database postgresql://postgres:postgres@db/postgres?sslmode=disable -path /tmp/migrations'
+    command: up
+    depends_on:
+      - db
+    networks:
+      - app
+    volumes:
+      - ./data/db:/tmp/migrations
+
+  db-drop: &basemigrate
+    profiles: ['tools']
+    image: migrate/migrate
+    entrypoint: 'migrate -database postgresql://postgres:postgres@db/postgres?sslmode=disable -path /tmp/migrations'
+    command: down
+    depends_on:
+      - db
+    networks:
+      - app
+    volumes:
+      - ./data/db:/tmp/migrations
+
+  create-migration:
+    <<: *basemigrate
+    entrypoint: migrate create -dir /tmp/migrations -ext sql
+    command: ''
+    networks:
+      - app
+
+networks:
+  app:
+    external: false
+
+volumes:
+  db:
