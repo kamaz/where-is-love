@@ -2,35 +2,45 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
-	"time"
+	"os/signal"
+	"syscall"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/kamaz/where-is-love/discover"
+	"github.com/kamaz/where-is-love/server"
+	"github.com/kamaz/where-is-love/swipe"
+	"github.com/kamaz/where-is-love/user"
+	"github.com/rs/zerolog/log"
 )
 
 func main() {
-	fmt.Println("Running Happily!")
-
 	dbpool, err := pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
+		log.Error().Err(err).Msg("failed to connect to database")
 		os.Exit(1)
 	}
 	defer dbpool.Close()
-	_, err = dbpool.Exec(
-		context.Background(),
-		"INSERT INTO app_user(email, password, name, gender, age) VALUES ($1, $2, $3, $4, $5) RETURNING id",
-		"test@example.com",
-		"secret",
-		"Test User",
-		"male",
-		25,
-	)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
-		os.Exit(1)
-	}
 
-	time.Sleep(10 * time.Minute)
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	stopper := make(chan struct{})
+	go func() {
+		<-done
+		close(stopper)
+	}()
+
+	// todo: configure enviornment variables
+	server := server.CreateServer(5000,
+		user.CreateUserEndpoint(user.CreateSQLUserRepository(dbpool)),
+		user.CreateLoginEndpoint(
+			user.CreateSQLUserRepository(dbpool),
+			&user.SimpleTokenGenerator{},
+		),
+		&discover.DiscoverEndpoint{},
+		&swipe.SwipeEndpoint{},
+	)
+	server.Run()
+	<-stopper
+	server.Stop(context.Background())
 }
