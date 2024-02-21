@@ -11,7 +11,6 @@ CREATE TABLE app_user (
   updated_at timestamp with time zone NOT NULL DEFAULT now()
 );
 
-
 CREATE UNIQUE INDEX app_user_email_idx ON app_user (email);
 CREATE INDEX app_user_email_pwd_idx ON app_user (email, password);
 

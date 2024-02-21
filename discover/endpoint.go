@@ -3,6 +3,7 @@ package discover
 import (
 	"net/http"
 
+	"github.com/kamaz/where-is-love/user"
 	"github.com/labstack/echo"
 )
 
@@ -29,26 +30,44 @@ import (
 //
 // iii) Bonus: Extend /discover to sort profiles by attractiveness.
 // You will need to come up with a ranking based on swipe statistics.
-//
-
 type MatchResult struct {
 	Results []*MatchResponse `json:"results"`
+}
+
+func CreateDiscoverEndpoint(
+	repo DiscoverRepository,
+	middlewares ...echo.MiddlewareFunc,
+) *DiscoverEndpoint {
+	return &DiscoverEndpoint{
+		repository:  repo,
+		middlewares: middlewares,
+	}
 }
 
 type MatchResponse struct {
 	Id     int    `json:"id"`
 	Name   string `json:"name"`
 	Gender string `json:"gender"`
-	Age    int    `json:"age"`
+	Age    uint   `json:"age"`
 }
 
 type DiscoverEndpoint struct {
+	repository  DiscoverRepository
 	middlewares []echo.MiddlewareFunc
 }
 
 func (u *DiscoverEndpoint) Process(e echo.Context) error {
-	// as part of context we will get user but at the moment lets return response
-	result := &MatchResult{[]*MatchResponse{}}
+	user := e.Request().Context().Value(user.UserKey).(*user.UserToken)
+	matches, err := u.repository.FindMatches(e.Request().Context(), &MatchCriteria{UserId: user.Id})
+	if err != nil {
+		return err
+	}
+	results := []*MatchResponse{}
+	for _, match := range matches {
+		matchResponse := MatchResponse(*match)
+		results = append(results, &matchResponse)
+	}
+	result := &MatchResult{Results: results}
 	e.JSON(http.StatusOK, result)
 	return nil
 }

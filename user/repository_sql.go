@@ -32,7 +32,8 @@ func (u *SQLUserRepository) CreateUser(ctx context.Context) (*UserEntity, error)
 		Password: "secret password",
 		Name:     "First Last",
 		Gender:   gender,
-		Age:      20,
+		// gnereate random age
+		Age: 20,
 	}
 
 	var userId int

@@ -35,6 +35,7 @@ func TestAPI(t *testing.T) {
 	client := http.Client{}
 	resp, err := client.Post("http://localhost:5000/user/create", "application/json", nil)
 	assert.NoError(err)
+	assert.Equal(http.StatusCreated, resp.StatusCode)
 
 	structuredResponse, err := bodyToMap(resp)
 	assert.NoError(err)
@@ -50,6 +51,7 @@ func TestAPI(t *testing.T) {
 		"password": structuredResponse["result"].(map[string]any)["password"],
 	})
 	resp, err = client.Post("http://localhost:5000/login", "application/json", payload)
+	assert.Equal(http.StatusOK, resp.StatusCode)
 
 	structuredResponse, err = bodyToMap(resp)
 	assert.NoError(err)
@@ -57,4 +59,17 @@ func TestAPI(t *testing.T) {
 	assert.Contains(structuredResponse, "result")
 	assert.Contains(structuredResponse["result"], "token")
 	assert.NotNil(structuredResponse["result"].(map[string]any)["token"])
+	token := structuredResponse["result"].(map[string]any)["token"].(string)
+
+	req, _ := http.NewRequest(http.MethodGet, "http://localhost:5000/discover", nil)
+	req.Header.Set(
+		"Authorization",
+		token,
+	)
+	resp, err = client.Do(req)
+	assert.NoError(err)
+	assert.Equal(http.StatusOK, resp.StatusCode)
+
+	structuredResponse, err = bodyToMap(resp)
+	assert.NoError(err)
 }

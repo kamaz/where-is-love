@@ -15,7 +15,7 @@ func AppAuthorization(tg TokenGenerator) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			req := c.Request()
-			token := req.Header.Get("Authorization")
+			token := req.Header.Get(echo.HeaderAuthorization)
 			user, err := tg.Validate(token)
 			if err != nil {
 				c.JSON(http.StatusUnauthorized, map[string]string{})

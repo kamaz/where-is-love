@@ -31,13 +31,18 @@ func main() {
 	}()
 
 	// todo: configure enviornment variables
+	token := &user.SimpleTokenGenerator{}
+	authMiddleware := user.AppAuthorization(token)
 	server := server.CreateServer(5000,
 		user.CreateUserEndpoint(user.CreateSQLUserRepository(dbpool)),
 		user.CreateLoginEndpoint(
 			user.CreateSQLUserRepository(dbpool),
-			&user.SimpleTokenGenerator{},
+			token,
 		),
-		&discover.DiscoverEndpoint{},
+		discover.CreateDiscoverEndpoint(
+			discover.CreateSQLDiscoveryRepository(dbpool),
+			authMiddleware,
+		),
 		&swipe.SwipeEndpoint{},
 	)
 	server.Run()
