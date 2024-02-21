@@ -26,14 +26,14 @@ func (u *SQLUserRepository) CreateUser(ctx context.Context) (*UserEntity, error)
 	if rand.Intn(100)%2 == 0 {
 		gender = "female"
 	}
+	age := 20 + rand.Intn(30)
 
 	user := &UserEntity{
 		Email:    fmt.Sprintf("test-%d@example.com", now),
 		Password: "secret password",
 		Name:     "First Last",
 		Gender:   gender,
-		// gnereate random age
-		Age: 20,
+		Age:      age,
 	}
 
 	var userId int
