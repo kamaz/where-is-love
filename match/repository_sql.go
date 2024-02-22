@@ -1,4 +1,4 @@
-package swipe
+package match
 
 import (
 	"context"
@@ -8,20 +8,54 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-// todo: rename to MatchRepository
-func CreateSQLSwipeRepository(pool *pgxpool.Pool) SwipeRepository {
-	return &SQLSwipeRepository{db: pool}
+func CreateSQLMatchRepository(pool *pgxpool.Pool) MatchRepository {
+	return &SQLMatchRepository{db: pool}
 }
 
-type SQLSwipeRepository struct {
+type SQLMatchRepository struct {
 	db *pgxpool.Pool
 }
 
-// save match
-// get match
-func (u *SQLSwipeRepository) CreatePreference(
+// It should return other profiles that are potential matches for this user.
+// Exclude profiles you’ve already swiped on.
+// select * app_user join swipes on
+
+// matches
+// { gender, age  }
+func (u *SQLMatchRepository) FindMatches(
 	ctx context.Context,
 	criteria *MatchCriteria,
+) ([]*MatchEntity, error) {
+	rows, err := u.db.Query(
+		ctx,
+		"SELECT id, name, gender, age FROM app_user WHERE id != $1",
+		criteria.UserId,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var matches []*MatchEntity
+	for rows.Next() {
+		var match MatchEntity
+		if err := rows.Scan(&match.Id, &match.Name, &match.Gender,
+			&match.Age); err != nil {
+			return nil, err
+		}
+		matches = append(matches, &match)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return matches, nil
+}
+
+func (u *SQLMatchRepository) CreatePreference(
+	ctx context.Context,
+	criteria *MatchPreferenceCriteria,
 ) (*MatchPreferenceEntity, error) {
 	_, err := u.db.Exec(
 		ctx,
@@ -41,9 +75,9 @@ func (u *SQLSwipeRepository) CreatePreference(
 	}, nil
 }
 
-func (u *SQLSwipeRepository) FindPreference(
+func (u *SQLMatchRepository) FindPreference(
 	ctx context.Context,
-	criteria *MatchCriteria,
+	criteria *MatchPreferenceCriteria,
 ) (*MatchPreferenceEntity, error) {
 	var preference MatchPreferenceEntity
 	err := u.db.QueryRow(

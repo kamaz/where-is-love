@@ -1,4 +1,4 @@
-package swipe
+package match
 
 import "errors"
 
@@ -9,11 +9,11 @@ const (
 	PreferenceNo  = "No"
 )
 
-func toCreateMatchCriteria(userId uint, match *SwipeRequest) (*MatchCriteria, error) {
+func toCreateMatchCriteria(userId uint, match *SwipeRequest) (*MatchPreferenceCriteria, error) {
 	if match.Preference != PreferenceYes && match.Preference != PreferenceNo {
 		return nil, ErrInvalidPreference
 	}
-	criteria := &MatchCriteria{
+	criteria := &MatchPreferenceCriteria{
 		UserId:     userId,
 		MatchId:    match.UserId,
 		Preference: match.Preference,

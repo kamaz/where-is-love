@@ -7,9 +7,8 @@ import (
 	"syscall"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/kamaz/where-is-love/discover"
+	"github.com/kamaz/where-is-love/match"
 	"github.com/kamaz/where-is-love/server"
-	"github.com/kamaz/where-is-love/swipe"
 	"github.com/kamaz/where-is-love/user"
 	"github.com/rs/zerolog/log"
 )
@@ -33,18 +32,19 @@ func main() {
 	// todo: configure enviornment variables
 	token := &user.SimpleTokenGenerator{}
 	authMiddleware := user.AppAuthorization(token)
+	matchRepo := match.CreateSQLMatchRepository(dbpool)
 	server := server.CreateServer(5000,
 		user.CreateUserEndpoint(user.CreateSQLUserRepository(dbpool)),
 		user.CreateLoginEndpoint(
 			user.CreateSQLUserRepository(dbpool),
 			token,
 		),
-		discover.CreateDiscoverEndpoint(
-			discover.CreateSQLDiscoveryRepository(dbpool),
+		match.CreateDiscoverEndpoint(
+			matchRepo,
 			authMiddleware,
 		),
-		swipe.CreateSwipeEndpoint(
-			swipe.CreateSQLSwipeRepository(dbpool),
+		match.CreateSwipeEndpoint(
+			matchRepo,
 			authMiddleware,
 		),
 	)

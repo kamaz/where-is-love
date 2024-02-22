@@ -1,4 +1,4 @@
-package discover
+package match
 
 import (
 	"context"
@@ -20,7 +20,7 @@ func TestDiscover(t *testing.T) {
 	c := e.NewContext(req, rec)
 
 	h := DiscoverEndpoint{
-		repository: &MockDiscoverRepository{},
+		repository: &MockMatchRepository{},
 	}
 
 	if assert.NoError(h.Process(c)) {

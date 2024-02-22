@@ -1,4 +1,4 @@
-package swipe
+package match
 
 import (
 	"net/http"
@@ -25,7 +25,7 @@ Note: matchID must only be included if matched is true.
 */
 
 func CreateSwipeEndpoint(
-	repo SwipeRepository,
+	repo MatchRepository,
 	middlewares ...echo.MiddlewareFunc,
 ) *SwipeEndpoint {
 	return &SwipeEndpoint{
@@ -52,7 +52,7 @@ type SwipeResult struct {
 
 type SwipeEndpoint struct {
 	middlewares []echo.MiddlewareFunc
-	repository  SwipeRepository
+	repository  MatchRepository
 }
 
 func (u *SwipeEndpoint) Process(e echo.Context) error {
@@ -75,7 +75,11 @@ func (u *SwipeEndpoint) Process(e echo.Context) error {
 
 	matchResult, err := u.repository.FindPreference(
 		ctx,
-		&MatchCriteria{UserId: swipeRequest.UserId, MatchId: user.Id, Preference: PreferenceYes},
+		&MatchPreferenceCriteria{
+			UserId:     swipeRequest.UserId,
+			MatchId:    user.Id,
+			Preference: PreferenceYes,
+		},
 	)
 	if err != nil {
 		return err

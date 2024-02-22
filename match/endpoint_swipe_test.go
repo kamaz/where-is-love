@@ -1,4 +1,4 @@
-package swipe
+package match
 
 import (
 	"context"
@@ -22,7 +22,7 @@ func TestSwipe_WithoutMatch(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	h := SwipeEndpoint{repository: CreateMockSwipeRepository()}
+	h := SwipeEndpoint{repository: CreateMockMatchRepository()}
 
 	if assert.NoError(h.Process(c)) {
 		assert.Equal(http.StatusOK, rec.Code)
@@ -47,7 +47,7 @@ func TestSwipe_WithMatch(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	h := SwipeEndpoint{repository: CreateMockSwipeRepository()}
+	h := SwipeEndpoint{repository: CreateMockMatchRepository()}
 
 	if assert.NoError(h.Process(c)) {
 		assert.Equal(http.StatusOK, rec.Code)

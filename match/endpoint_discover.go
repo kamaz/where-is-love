@@ -1,4 +1,4 @@
-package discover
+package match
 
 import (
 	"net/http"
@@ -35,7 +35,7 @@ type MatchResult struct {
 }
 
 func CreateDiscoverEndpoint(
-	repo DiscoverRepository,
+	repo MatchRepository,
 	middlewares ...echo.MiddlewareFunc,
 ) *DiscoverEndpoint {
 	return &DiscoverEndpoint{
@@ -52,7 +52,7 @@ type MatchResponse struct {
 }
 
 type DiscoverEndpoint struct {
-	repository  DiscoverRepository
+	repository  MatchRepository
 	middlewares []echo.MiddlewareFunc
 }
 
