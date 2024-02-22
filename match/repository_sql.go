@@ -28,7 +28,7 @@ func (u *SQLMatchRepository) FindMatches(
 ) ([]*MatchEntity, error) {
 	rows, err := u.db.Query(
 		ctx,
-		"SELECT id, name, gender, age FROM app_user WHERE id != $1",
+		"SELECT id, name, gender, age FROM app_user WHERE id != $1 AND id NOT IN (SELECT to_id FROM user_preference WHERE from_id = $1)",
 		criteria.UserId,
 	)
 	if err != nil {

@@ -21,14 +21,14 @@ func loginEndpoint(assert *assert.Assertions, user map[string]any) string {
 	resp, err := client.Post("http://localhost:5000/login", "application/json", payload)
 	assert.Equal(http.StatusOK, resp.StatusCode)
 
-	tokenResponseUser1, err := bodyToMap(resp)
+	tokenResponse, err := bodyToMap(resp)
 	assert.NoError(err)
 
-	assert.Contains(tokenResponseUser1, "result")
-	assert.Contains(tokenResponseUser1["result"], "token")
-	assert.NotNil(tokenResponseUser1["result"].(map[string]any)["token"])
-	tokenUser1 := tokenResponseUser1["result"].(map[string]any)["token"].(string)
-	return tokenUser1
+	assert.Contains(tokenResponse, "result")
+	assert.Contains(tokenResponse["result"], "token")
+	assert.NotNil(tokenResponse["result"].(map[string]any)["token"])
+	token := tokenResponse["result"].(map[string]any)["token"].(string)
+	return token
 }
 
 // helper function to convert the response body to a map
@@ -82,17 +82,17 @@ func discoverEndpoint(assert *assert.Assertions, token string) []any {
 
 func swipeEndpoint(assert *assert.Assertions, token string, body map[string]any) map[string]any {
 	client := http.Client{}
-	payloadSwipeUser1, err := mapToBody(body)
+	payload, err := mapToBody(body)
 	assert.NoError(err)
-	swipeReqUser1, _ := http.NewRequest(
+	swipeReq, _ := http.NewRequest(
 		http.MethodPost,
 		"http://localhost:5000/swipe",
-		payloadSwipeUser1,
+		payload,
 	)
-	swipeReqUser1.Header.Set("Content-Type", echo.MIMEApplicationJSON)
-	swipeReqUser1.Header.Set("Authorization", token)
+	swipeReq.Header.Set("Content-Type", echo.MIMEApplicationJSON)
+	swipeReq.Header.Set("Authorization", token)
 
-	resp, err := client.Do(swipeReqUser1)
+	resp, err := client.Do(swipeReq)
 	assert.NoError(err)
 	assert.Equal(http.StatusOK, resp.StatusCode)
 	firstSwipeResponse, err := bodyToMap(resp)

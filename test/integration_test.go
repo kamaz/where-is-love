@@ -40,10 +40,10 @@ func TestAPI(t *testing.T) {
 	assert.Contains(firstSwipeResult, "matched")
 	assert.NotContains(firstSwipeResult, "matchID")
 
-	// todo: now check discover to ensure we don't have the match anymore
+	// after swiping user two shouldn't be in matches
 	matchesForUser1 = discoverEndpoint(assert, tokenUser1)
 	userTwo = findUser(matchesForUser1, users[1])
-	// assert.Nil(userTwo)
+	assert.Nil(userTwo)
 
 	// now lets switch user ot matched and swipe as well so we see they are matched
 	tokenUser2 := loginEndpoint(assert, users[1])
@@ -55,10 +55,14 @@ func TestAPI(t *testing.T) {
 
 	// now lets swipe date with user 1
 	secondSwipeResult := swipeEndpoint(assert, tokenUser2, map[string]any{
-		"userID":     matchUser["id"],
+		"userID":     matchToUser1["id"],
 		"preference": "YES",
 	})
 	// as both have swiped yes, they should be matched
 	assert.Contains(secondSwipeResult, "matched")
 	assert.Contains(secondSwipeResult, "matchID")
+
+	matchesForUser2 = discoverEndpoint(assert, tokenUser2)
+	userOne := findUser(matchesForUser2, users[0])
+	assert.Nil(userOne)
 }

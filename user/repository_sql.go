@@ -31,7 +31,7 @@ func (u *SQLUserRepository) CreateUser(ctx context.Context) (*UserEntity, error)
 	user := &UserEntity{
 		Email:    fmt.Sprintf("test-%d@example.com", now),
 		Password: "secret password",
-		Name:     "First Last",
+		Name:     fmt.Sprintf("First-%d Last", now),
 		Gender:   gender,
 		Age:      uint(age),
 	}
