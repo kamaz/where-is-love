@@ -45,7 +45,7 @@ func CreateDiscoverEndpoint(
 }
 
 type MatchResponse struct {
-	Id     int    `json:"id"`
+	Id     uint   `json:"id"`
 	Name   string `json:"name"`
 	Gender string `json:"gender"`
 	Age    uint   `json:"age"`
@@ -62,6 +62,7 @@ func (u *DiscoverEndpoint) Process(e echo.Context) error {
 	if err != nil {
 		return err
 	}
+
 	results := []*MatchResponse{}
 	for _, match := range matches {
 		matchResponse := MatchResponse(*match)

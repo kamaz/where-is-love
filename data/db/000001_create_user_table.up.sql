@@ -14,3 +14,13 @@ CREATE TABLE app_user (
 CREATE UNIQUE INDEX app_user_email_idx ON app_user (email);
 CREATE INDEX app_user_email_pwd_idx ON app_user (email, password);
 
+CREATE TYPE preference AS ENUM ('YES', 'NO');
+CREATE TABLE user_preference (
+  from_id int NOT NULL,
+  to_id int NOT NULL,
+  preference preference NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
+CREATE UNIQUE INDEX user_pref_from_to_id_idx ON user_preference (from_id, to_id);
+

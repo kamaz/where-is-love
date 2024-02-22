@@ -20,7 +20,7 @@ func CreateSQLUserRepository(pool *pgxpool.Pool) *SQLUserRepository {
 }
 
 func (u *SQLUserRepository) CreateUser(ctx context.Context) (*UserEntity, error) {
-	now := time.Now().Unix()
+	now := time.Now().UnixNano()
 
 	gender := "male"
 	if rand.Intn(100)%2 == 0 {
@@ -33,13 +33,13 @@ func (u *SQLUserRepository) CreateUser(ctx context.Context) (*UserEntity, error)
 		Password: "secret password",
 		Name:     "First Last",
 		Gender:   gender,
-		Age:      age,
+		Age:      uint(age),
 	}
 
-	var userId int
+	var userId uint
 
 	err := u.db.QueryRow(
-		context.Background(),
+		ctx,
 		"INSERT INTO app_user(email, password, name, gender, age) VALUES ($1, $2, $3, $4, $5) RETURNING id",
 		user.Email,
 		user.Password,
@@ -62,7 +62,7 @@ func (u *SQLUserRepository) GetUserByEmailAndPassword(
 ) (*UserEntity, error) {
 	var user UserEntity
 	err := u.db.QueryRow(
-		context.Background(),
+		ctx,
 		"SELECT id, email, name, gender, age FROM app_user WHERE email = $1 AND password = $2",
 		criteria.Email,
 		criteria.Password,

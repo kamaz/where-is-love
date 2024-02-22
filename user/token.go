@@ -9,11 +9,11 @@ import (
 var _ TokenGenerator = (*SimpleTokenGenerator)(nil)
 
 type UserToken struct {
-	Id     int    `json:"id"`
+	Id     uint   `json:"id"`
 	Email  string `json:"email"`
 	Name   string `json:"name"`
 	Gender string `json:"gender"`
-	Age    int    `json:"age"`
+	Age    uint   `json:"age"`
 }
 
 func toToken(entity *UserEntity) *UserToken {

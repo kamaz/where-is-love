@@ -20,13 +20,12 @@ type SQLDiscoverRepository struct {
 
 // matches
 // { gender, age  }
-
 func (u *SQLDiscoverRepository) FindMatches(
 	ctx context.Context,
 	criteria *MatchCriteria,
 ) ([]*MatchEntity, error) {
 	rows, err := u.db.Query(
-		context.Background(),
+		ctx,
 		"SELECT id, name, gender, age FROM app_user WHERE id != $1",
 		criteria.UserId,
 	)

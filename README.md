@@ -5,18 +5,31 @@
 ## No no no
 
 - [ ] Password is not encrypted
-- [ ] We would use proper jwt token
 - [ ] Logging format and definition
 
 ## Architecture decisions
 
 - Split the application based on the bounded context like `user`, `discovery` and `swipe`
--
+- Because this is test application keeping separating of contexts
+- Logging
+- Monitoring
+- Because there is not much logic keeping it in the `endpoint` in real implementation that would be in some service
+- `postgres` being used as search engine which is not optimal
+
+## Future improvements
+
+- [ ] `test` directory is being used for integration tests and application has to be up and running
+- [ ] migrate authentication to `jwt` token
+- [ ] think about further splitting `bounded context`s to enable better module separation
+- [ ] more documentation
+- [ ] create `openapi` specification and generate client to improve integration test readability instead of using base types
 
 ## Prerequisite
 
 1. [Docker](https://docs.docker.com/engine/install/)
 2. [go](https://go.dev/doc/install)
+
+You have to use `golang` +1.22.
 
 ## How to start app 
 

@@ -43,7 +43,10 @@ func main() {
 			discover.CreateSQLDiscoveryRepository(dbpool),
 			authMiddleware,
 		),
-		&swipe.SwipeEndpoint{},
+		swipe.CreateSwipeEndpoint(
+			swipe.CreateSQLSwipeRepository(dbpool),
+			authMiddleware,
+		),
 	)
 	server.Run()
 	<-stopper

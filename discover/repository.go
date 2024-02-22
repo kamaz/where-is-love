@@ -8,14 +8,14 @@ var (
 )
 
 type MatchEntity struct {
-	Id     int
+	Id     uint
 	Name   string
 	Gender string
 	Age    uint
 }
 
 type MatchCriteria struct {
-	UserId  int
+	UserId  uint
 	AgeFrom uint
 	AgeTo   uint
 	Gender  string
