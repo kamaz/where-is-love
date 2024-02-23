@@ -15,10 +15,9 @@ type MatchEntity struct {
 }
 
 type MatchCriteria struct {
-	UserId  uint
-	AgeFrom uint
-	AgeTo   uint
-	Gender  string
+	UserId uint
+	Age    string
+	Gender string
 }
 
 type MatchPreferenceEntity struct {

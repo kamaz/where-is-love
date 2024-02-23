@@ -1,6 +1,9 @@
 package match
 
-import "context"
+import (
+	"context"
+	"strconv"
+)
 
 type MockMatchRepository struct {
 	users map[uint]*MatchPreferenceEntity
@@ -37,10 +40,37 @@ func (u *MockMatchRepository) FindMatches(
 		Id:     2,
 		Name:   "Joanna",
 		Gender: "female",
-		Age:    23,
+		Age:    25,
+	}
+	entries := []*MatchEntity{entry1, entry2}
+	result := []*MatchEntity{}
+	// fitler by criteria
+	if criteria.Gender != "" {
+		for _, entry := range entries {
+			if entry.Gender == criteria.Gender {
+				result = append(result, entry)
+			}
+		}
+	} else {
+		result = entries
 	}
 
-	return []*MatchEntity{entry1, entry2}, nil
+	finalResult := []*MatchEntity{}
+	if criteria.Age != "" {
+		for _, entry := range result {
+			value, err := strconv.Atoi(criteria.Age)
+			if err != nil {
+				continue
+			}
+			if entry.Age == uint(value) {
+				finalResult = append(finalResult, entry)
+			}
+		}
+	} else {
+		finalResult = result
+	}
+
+	return finalResult, nil
 }
 
 func (u *MockMatchRepository) CreatePreference(

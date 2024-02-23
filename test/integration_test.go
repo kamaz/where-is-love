@@ -20,7 +20,7 @@ func TestAPI(t *testing.T) {
 	// login as user 1
 	tokenUser1 := loginEndpoint(assert, users[0])
 
-	matchesForUser1 := discoverEndpoint(assert, tokenUser1)
+	matchesForUser1 := discoverEndpoint(assert, tokenUser1, "")
 	// check that self does not exist in the result
 	selfUser := findUser(matchesForUser1, users[0])
 	assert.Nil(selfUser)
@@ -41,14 +41,14 @@ func TestAPI(t *testing.T) {
 	assert.NotContains(firstSwipeResult, "matchID")
 
 	// after swiping user two shouldn't be in matches
-	matchesForUser1 = discoverEndpoint(assert, tokenUser1)
+	matchesForUser1 = discoverEndpoint(assert, tokenUser1, "")
 	userTwo = findUser(matchesForUser1, users[1])
 	assert.Nil(userTwo)
 
 	// now lets switch user ot matched and swipe as well so we see they are matched
 	tokenUser2 := loginEndpoint(assert, users[1])
 
-	matchesForUser2 := discoverEndpoint(assert, tokenUser2)
+	matchesForUser2 := discoverEndpoint(assert, tokenUser2, "")
 	// check that user 2 can match to user 1
 	matchToUser1 := findUser(matchesForUser2, users[0])
 	assert.NotNil(matchToUser1)
@@ -62,7 +62,23 @@ func TestAPI(t *testing.T) {
 	assert.Contains(secondSwipeResult, "matched")
 	assert.Contains(secondSwipeResult, "matchID")
 
-	matchesForUser2 = discoverEndpoint(assert, tokenUser2)
+	matchesForUser2 = discoverEndpoint(assert, tokenUser2, "")
 	userOne := findUser(matchesForUser2, users[0])
 	assert.Nil(userOne)
+
+	// filter by gender
+	matchesForUser2FemaleOnly := discoverEndpoint(assert, tokenUser2, "gender=female")
+	resultOnlyFemale := usersMatchPropertyValue(matchesForUser2FemaleOnly, "gender", "female")
+	assert.True(resultOnlyFemale)
+
+	// filter by age
+	matchesForUser2Age22Only := discoverEndpoint(assert, tokenUser2, "age=22")
+	resultOnlyAge22 := usersMatchPropertyValue(matchesForUser2Age22Only, "age", "22")
+	assert.True(resultOnlyAge22)
+
+	// filter by age and gender
+	matchesForUser2FemaleAge22 := discoverEndpoint(assert, tokenUser2, "gender=female&age=22")
+	resultAge22 := usersMatchPropertyValue(matchesForUser2FemaleAge22, "age", "22")
+	resultFemale := usersMatchPropertyValue(matchesForUser2FemaleAge22, "gender", "female")
+	assert.True(resultAge22 && resultFemale)
 }

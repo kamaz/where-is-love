@@ -3,6 +3,8 @@ package match
 import (
 	"context"
 	"errors"
+	"fmt"
+	"strings"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -20,16 +22,42 @@ type SQLMatchRepository struct {
 // Exclude profiles you’ve already swiped on.
 // select * app_user join swipes on
 
+func (u *SQLMatchRepository) createQueryAndParams(
+	criteria *MatchCriteria,
+) (string, []any) {
+	filters := []string{}
+	filterValues := []any{criteria.UserId}
+	if criteria.Age != "" && criteria.Gender != "" {
+		filters = append(filters, "AND age = $2 AND gender = $3")
+		filterValues = append(filterValues, criteria.Age, criteria.Gender)
+	} else {
+		if criteria.Age != "" {
+			filters = append(filters, "AND age = $2")
+			filterValues = append(filterValues, criteria.Age)
+		} else if criteria.Gender != "" {
+			filters = append(filters, "AND gender = $2")
+			filterValues = append(filterValues, criteria.Gender)
+		}
+	}
+	query := fmt.Sprintf(
+		"SELECT id, name, gender, age FROM app_user WHERE id != $1 %s AND id NOT IN (SELECT to_id FROM user_preference WHERE from_id = $1)",
+		strings.Join(filters, " "),
+	)
+
+	return query, filterValues
+}
+
 // matches
 // { gender, age  }
 func (u *SQLMatchRepository) FindMatches(
 	ctx context.Context,
 	criteria *MatchCriteria,
 ) ([]*MatchEntity, error) {
+	query, filterValues := u.createQueryAndParams(criteria)
 	rows, err := u.db.Query(
 		ctx,
-		"SELECT id, name, gender, age FROM app_user WHERE id != $1 AND id NOT IN (SELECT to_id FROM user_preference WHERE from_id = $1)",
-		criteria.UserId,
+		query,
+		filterValues...,
 	)
 	if err != nil {
 		return nil, err

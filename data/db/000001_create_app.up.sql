@@ -14,6 +14,7 @@ CREATE TABLE app_user (
 CREATE UNIQUE INDEX app_user_email_idx ON app_user (email);
 CREATE INDEX app_user_email_pwd_idx ON app_user (email, password);
 
+-- todo: maybe we can use foreign key constraint here
 CREATE TYPE preference AS ENUM ('YES', 'NO');
 CREATE TABLE user_preference (
   from_id int NOT NULL,
@@ -23,4 +24,5 @@ CREATE TABLE user_preference (
 );
 
 CREATE UNIQUE INDEX user_pref_from_to_id_idx ON user_preference (from_id, to_id);
+
 

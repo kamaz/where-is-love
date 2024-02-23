@@ -3,6 +3,7 @@ package test
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -61,9 +62,22 @@ func findUser(users []any, user map[string]any) map[string]any {
 	return foundUser
 }
 
-func discoverEndpoint(assert *assert.Assertions, token string) []any {
+func usersMatchPropertyValue(users []any, property string, value string) bool {
+	for _, result := range users {
+		if fmt.Sprintf("%v", result.(map[string]any)[property]) != value {
+			return false
+		}
+	}
+	return true
+}
+
+func discoverEndpoint(assert *assert.Assertions, token string, filter string) []any {
 	client := http.Client{}
-	discoverReq, _ := http.NewRequest(http.MethodGet, "http://localhost:5000/discover", nil)
+	endpoint := "http://localhost:5000/discover"
+	if filter != "" {
+		endpoint = fmt.Sprintf("%s?%s", endpoint, filter)
+	}
+	discoverReq, _ := http.NewRequest(http.MethodGet, endpoint, nil)
 	discoverReq.Header.Set(
 		"Authorization",
 		token,

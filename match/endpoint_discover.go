@@ -58,7 +58,13 @@ type DiscoverEndpoint struct {
 
 func (u *DiscoverEndpoint) Process(e echo.Context) error {
 	user := e.Request().Context().Value(user.UserKey).(*user.UserToken)
-	matches, err := u.repository.FindMatches(e.Request().Context(), &MatchCriteria{UserId: user.Id})
+	age := e.QueryParam("age")
+	gender := e.QueryParam("gender")
+	matches, err := u.repository.FindMatches(e.Request().Context(), &MatchCriteria{
+		UserId: user.Id,
+		Age:    age,
+		Gender: gender,
+	})
 	if err != nil {
 		return err
 	}
