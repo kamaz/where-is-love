@@ -24,24 +24,38 @@ type SQLMatchRepository struct {
 
 func (u *SQLMatchRepository) createQueryAndParams(
 	criteria *MatchCriteria,
+	sort *Sort,
 ) (string, []any) {
 	filters := []string{}
-	filterValues := []any{criteria.UserId}
+	filterValues := []any{criteria.UserId, criteria.Latitude, criteria.Longitude}
 	if criteria.Age != "" && criteria.Gender != "" {
-		filters = append(filters, "AND age = $2 AND gender = $3")
+		filters = append(filters, "AND age = $4 AND gender = $5")
 		filterValues = append(filterValues, criteria.Age, criteria.Gender)
 	} else {
 		if criteria.Age != "" {
-			filters = append(filters, "AND age = $2")
+			filters = append(filters, "AND age = $4")
 			filterValues = append(filterValues, criteria.Age)
 		} else if criteria.Gender != "" {
-			filters = append(filters, "AND gender = $2")
+			filters = append(filters, "AND gender = $4")
 			filterValues = append(filterValues, criteria.Gender)
 		}
 	}
+	orderBy := ""
+	if sort != nil {
+		sortOrder := "ASC"
+		if !sort.Asc {
+			sortOrder = "DESC"
+		}
+		orderBy = fmt.Sprintf("ORDER BY distance_in_kilometers %s", sortOrder)
+	}
+
 	query := fmt.Sprintf(
-		"SELECT id, name, gender, age FROM app_user WHERE id != $1 %s AND id NOT IN (SELECT to_id FROM user_preference WHERE from_id = $1)",
+		"SELECT id, name, gender, age, earth_distance(ll_to_earth(latitude, longitude), ll_to_earth($2, $3))::integer/1000 AS distance_in_kilometers"+ // select
+			" FROM app_user "+ // from
+			" WHERE id != $1 %s AND id NOT IN (SELECT to_id FROM user_preference WHERE from_id = $1)"+ // where
+			" %s", // orderBy
 		strings.Join(filters, " "),
+		orderBy,
 	)
 
 	return query, filterValues
@@ -52,8 +66,9 @@ func (u *SQLMatchRepository) createQueryAndParams(
 func (u *SQLMatchRepository) FindMatches(
 	ctx context.Context,
 	criteria *MatchCriteria,
+	sort *Sort,
 ) ([]*MatchEntity, error) {
-	query, filterValues := u.createQueryAndParams(criteria)
+	query, filterValues := u.createQueryAndParams(criteria, sort)
 	rows, err := u.db.Query(
 		ctx,
 		query,
@@ -68,7 +83,7 @@ func (u *SQLMatchRepository) FindMatches(
 	for rows.Next() {
 		var match MatchEntity
 		if err := rows.Scan(&match.Id, &match.Name, &match.Gender,
-			&match.Age); err != nil {
+			&match.Age, &match.DistanceFromMe); err != nil {
 			return nil, err
 		}
 		matches = append(matches, &match)

@@ -21,7 +21,7 @@ func TestCreateUser(t *testing.T) {
 	if assert.NoError(h.Process(c)) {
 		assert.Equal(http.StatusCreated, rec.Code)
 		assert.JSONEq(
-			`{"result": {"age":22, "email": "test@email.com", "gender": "male", "id": 1, "name": "name", "password": "password" }}`,
+			`{"result": {"age":22, "email": "test@email.com", "gender": "male", "id": 1, "name": "name", "password": "password", "longitude": 0, "latitude": 0, "city": "" }}`,
 			rec.Body.String(),
 		)
 	}

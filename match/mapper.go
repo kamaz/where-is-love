@@ -1,6 +1,9 @@
 package match
 
-import "errors"
+import (
+	"errors"
+	"strings"
+)
 
 var ErrInvalidPreference = errors.New("invalid preference")
 
@@ -30,4 +33,24 @@ func toSwipeResponse(preference *MatchPreferenceEntity) *SwipeResponse {
 	}
 
 	return response
+}
+
+func toSort(sort string) *Sort {
+	ascSort := strings.Split(sort, "+")
+	if len(ascSort) == 2 && ascSort[1] == "distanceFromMe" {
+		return &Sort{
+			Property: ascSort[1],
+			Asc:      true,
+		}
+	}
+
+	descSort := strings.Split(sort, "-")
+	if len(descSort) == 2 && descSort[1] == "distanceFromMe" {
+		return &Sort{
+			Property: descSort[1],
+			Asc:      false,
+		}
+	}
+
+	return nil
 }

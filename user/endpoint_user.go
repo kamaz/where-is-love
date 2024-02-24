@@ -8,12 +8,15 @@ import (
 )
 
 type UserResponse struct {
-	Id       uint   `json:"id"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Name     string `json:"name"`
-	Gender   string `json:"gender"`
-	Age      uint   `json:"age"`
+	Id        uint    `json:"id"`
+	Email     string  `json:"email"`
+	Password  string  `json:"password"`
+	Name      string  `json:"name"`
+	Gender    string  `json:"gender"`
+	Age       uint    `json:"age"`
+	Longitude float64 `json:"longitude"`
+	Latitude  float64 `json:"latitude"`
+	City      string  `json:"city"`
 }
 
 type UserResult struct {

@@ -29,6 +29,7 @@ func CreateMockMatchRepository() *MockMatchRepository {
 func (u *MockMatchRepository) FindMatches(
 	ctx context.Context,
 	criteria *MatchCriteria,
+	sort *Sort,
 ) ([]*MatchEntity, error) {
 	entry1 := &MatchEntity{
 		Id:     1,

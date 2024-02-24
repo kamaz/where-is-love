@@ -8,16 +8,19 @@ var (
 )
 
 type MatchEntity struct {
-	Id     uint
-	Name   string
-	Gender string
-	Age    uint
+	Id             uint
+	Name           string
+	Gender         string
+	Age            uint
+	DistanceFromMe uint
 }
 
 type MatchCriteria struct {
-	UserId uint
-	Age    string
-	Gender string
+	UserId    uint
+	Longitude float64
+	Latitude  float64
+	Age       string
+	Gender    string
 }
 
 type MatchPreferenceEntity struct {
@@ -33,8 +36,13 @@ type MatchPreferenceCriteria struct {
 	Preference string
 }
 
+type Sort struct {
+	Property string
+	Asc      bool
+}
+
 type MatchRepository interface {
-	FindMatches(context.Context, *MatchCriteria) ([]*MatchEntity, error)
+	FindMatches(context.Context, *MatchCriteria, *Sort) ([]*MatchEntity, error)
 	CreatePreference(context.Context, *MatchPreferenceCriteria) (*MatchPreferenceEntity, error)
 	FindPreference(context.Context, *MatchPreferenceCriteria) (*MatchPreferenceEntity, error)
 }

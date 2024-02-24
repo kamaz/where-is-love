@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -10,7 +11,7 @@ func TestAPI(t *testing.T) {
 	assert := assert.New(t)
 	// create 2 users
 	users := []map[string]any{}
-	for range 2 {
+	for range 10 {
 		user := createUserEndpoint(assert)
 		if len(users) != 2 {
 			users = append(users, user)
@@ -72,13 +73,41 @@ func TestAPI(t *testing.T) {
 	assert.True(resultOnlyFemale)
 
 	// filter by age
-	matchesForUser2Age22Only := discoverEndpoint(assert, tokenUser2, "age=22")
-	resultOnlyAge22 := usersMatchPropertyValue(matchesForUser2Age22Only, "age", "22")
-	assert.True(resultOnlyAge22)
+	// todo: find an age that exists
+	searchAge := fmt.Sprintf("%v", matchesForUser2[0].(map[string]any)["age"])
+	matchesForUser2AgeOnly := discoverEndpoint(
+		assert,
+		tokenUser2,
+		fmt.Sprintf("age=%s", searchAge),
+	)
+	resultOnlyAge := usersMatchPropertyValue(matchesForUser2AgeOnly, "age", searchAge)
+	assert.True(resultOnlyAge)
 
 	// filter by age and gender
-	matchesForUser2FemaleAge22 := discoverEndpoint(assert, tokenUser2, "gender=female&age=22")
-	resultAge22 := usersMatchPropertyValue(matchesForUser2FemaleAge22, "age", "22")
-	resultFemale := usersMatchPropertyValue(matchesForUser2FemaleAge22, "gender", "female")
+	matchesForUser2FemaleAge := discoverEndpoint(
+		assert,
+		tokenUser2,
+		fmt.Sprintf("gender=female&age=%s", searchAge),
+	)
+	resultAge22 := usersMatchPropertyValue(matchesForUser2FemaleAge, "age", searchAge)
+	resultFemale := usersMatchPropertyValue(matchesForUser2FemaleAge, "gender", "female")
 	assert.True(resultAge22 && resultFemale)
+
+	sort := discoverEndpoint(
+		assert,
+		tokenUser2,
+		"sort=%2BdistanceFromMe",
+	)
+	firstMatch := sort[0].(map[string]any)["distanceFromMe"]
+	lastMatch := sort[len(sort)-1].(map[string]any)["distanceFromMe"]
+	assert.GreaterOrEqual(lastMatch, firstMatch)
+
+	sort = discoverEndpoint(
+		assert,
+		tokenUser2,
+		"sort=-distanceFromMe",
+	)
+	firstMatch = sort[0].(map[string]any)["distanceFromMe"]
+	lastMatch = sort[len(sort)-1].(map[string]any)["distanceFromMe"]
+	assert.GreaterOrEqual(firstMatch, lastMatch)
 }

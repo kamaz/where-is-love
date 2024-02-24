@@ -45,10 +45,11 @@ func CreateDiscoverEndpoint(
 }
 
 type MatchResponse struct {
-	Id     uint   `json:"id"`
-	Name   string `json:"name"`
-	Gender string `json:"gender"`
-	Age    uint   `json:"age"`
+	Id             uint   `json:"id"`
+	Name           string `json:"name"`
+	Gender         string `json:"gender"`
+	Age            uint   `json:"age"`
+	DistanceFromMe uint   `json:"distanceFromMe"`
 }
 
 type DiscoverEndpoint struct {
@@ -60,11 +61,18 @@ func (u *DiscoverEndpoint) Process(e echo.Context) error {
 	user := e.Request().Context().Value(user.UserKey).(*user.UserToken)
 	age := e.QueryParam("age")
 	gender := e.QueryParam("gender")
-	matches, err := u.repository.FindMatches(e.Request().Context(), &MatchCriteria{
-		UserId: user.Id,
-		Age:    age,
-		Gender: gender,
-	})
+	sort := e.QueryParam("sort")
+	matches, err := u.repository.FindMatches(
+		e.Request().Context(),
+		&MatchCriteria{
+			UserId:    user.Id,
+			Longitude: user.Longitude,
+			Latitude:  user.Latitude,
+			Age:       age,
+			Gender:    gender,
+		},
+		toSort(sort),
+	)
 	if err != nil {
 		return err
 	}

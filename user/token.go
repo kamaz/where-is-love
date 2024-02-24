@@ -9,20 +9,26 @@ import (
 var _ TokenGenerator = (*SimpleTokenGenerator)(nil)
 
 type UserToken struct {
-	Id     uint   `json:"id"`
-	Email  string `json:"email"`
-	Name   string `json:"name"`
-	Gender string `json:"gender"`
-	Age    uint   `json:"age"`
+	Id        uint    `json:"id"`
+	Email     string  `json:"email"`
+	Name      string  `json:"name"`
+	Gender    string  `json:"gender"`
+	Age       uint    `json:"age"`
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+	City      string  `json:"city"`
 }
 
 func toToken(entity *UserEntity) *UserToken {
 	return &UserToken{
-		Id:     entity.Id,
-		Email:  entity.Email,
-		Name:   entity.Name,
-		Gender: entity.Gender,
-		Age:    entity.Age,
+		Id:        entity.Id,
+		Email:     entity.Email,
+		Name:      entity.Name,
+		Gender:    entity.Gender,
+		Age:       entity.Age,
+		Latitude:  entity.Latitude,
+		Longitude: entity.Longitude,
+		City:      entity.City,
 	}
 }
 

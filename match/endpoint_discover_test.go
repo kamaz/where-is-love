@@ -26,7 +26,7 @@ func TestDiscover(t *testing.T) {
 	if assert.NoError(h.Process(c)) {
 		assert.Equal(http.StatusOK, rec.Code)
 		assert.JSONEq(
-			`{"results": [{"id": 1, "name": "Mark", "gender": "male", "age":23}, {"id": 2, "name": "Joanna", "gender": "female", "age":25}]}`,
+			`{"results": [{"id": 1, "name": "Mark", "gender": "male", "age":23, "distanceFromMe": 0}, {"id": 2, "name": "Joanna", "gender": "female", "age":25, "distanceFromMe": 0}]}`,
 			rec.Body.String(),
 		)
 	}
@@ -47,7 +47,7 @@ func TestDiscoverWithGenderFilter(t *testing.T) {
 	if assert.NoError(h.Process(c)) {
 		assert.Equal(http.StatusOK, rec.Code)
 		assert.JSONEq(
-			`{"results": [{"id": 1, "name": "Mark", "gender": "male", "age":23}]}`,
+			`{"results": [{"id": 1, "name": "Mark", "gender": "male", "age":23, "distanceFromMe": 0}]}`,
 			rec.Body.String(),
 		)
 	}
@@ -68,7 +68,7 @@ func TestDiscoverWithAgeFilter(t *testing.T) {
 	if assert.NoError(h.Process(c)) {
 		assert.Equal(http.StatusOK, rec.Code)
 		assert.JSONEq(
-			`{"results": [{"id": 2, "name": "Joanna", "gender": "female", "age":25}]}`,
+			`{"results": [{"id": 2, "name": "Joanna", "gender": "female", "age":25, "distanceFromMe": 0}]}`,
 			rec.Body.String(),
 		)
 	}
@@ -89,7 +89,7 @@ func TestDiscoverWithAgeAndGenderFilters(t *testing.T) {
 	if assert.NoError(h.Process(c)) {
 		assert.Equal(http.StatusOK, rec.Code)
 		assert.JSONEq(
-			`{"results": [{"id": 2, "name": "Joanna", "gender": "female", "age":25}]}`,
+			`{"results": [{"id": 2, "name": "Joanna", "gender": "female", "age":25, "distanceFromMe": 0}]}`,
 			rec.Body.String(),
 		)
 	}

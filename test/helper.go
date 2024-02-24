@@ -89,9 +89,12 @@ func discoverEndpoint(assert *assert.Assertions, token string, filter string) []
 	discoverResponse, err := bodyToMap(resp)
 	assert.NoError(err)
 	assert.IsType([]any{}, discoverResponse["results"])
-	discoverResultsUser1 := discoverResponse["results"].([]any)
-	assert.Greater(len(discoverResultsUser1), 1)
-	return discoverResultsUser1
+	discoverResults := discoverResponse["results"].([]any)
+	assert.GreaterOrEqual(len(discoverResults), 1)
+	match := discoverResults[0].(map[string]any)
+	assert.Contains(match, "distanceFromMe")
+	assert.NotNil(match["distanceFromMe"])
+	return discoverResults
 }
 
 func swipeEndpoint(assert *assert.Assertions, token string, body map[string]any) map[string]any {

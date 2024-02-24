@@ -12,12 +12,15 @@ var (
 )
 
 type UserEntity struct {
-	Id       uint
-	Email    string
-	Password string
-	Name     string
-	Gender   string
-	Age      uint
+	Id        uint
+	Email     string
+	Password  string
+	Name      string
+	Gender    string
+	Age       uint
+	Longitude float64
+	Latitude  float64
+	City      string
 }
 
 type EmailAndPasswordCriteria struct {

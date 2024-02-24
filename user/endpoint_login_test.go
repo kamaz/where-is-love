@@ -24,7 +24,7 @@ func TestLogin(t *testing.T) {
 	if assert.NoError(h.Process(c)) {
 		assert.Equal(http.StatusOK, rec.Code)
 		assert.JSONEq(
-			`{"result": {"token": "eyJpZCI6MSwiZW1haWwiOiJ0ZXN0QGVtYWlsLmNvbSIsIm5hbWUiOiJuYW1lIiwiZ2VuZGVyIjoibWFsZSIsImFnZSI6MjJ9"}}`,
+			`{"result": {"token": "eyJpZCI6MSwiZW1haWwiOiJ0ZXN0QGVtYWlsLmNvbSIsIm5hbWUiOiJuYW1lIiwiZ2VuZGVyIjoibWFsZSIsImFnZSI6MjIsImxhdGl0dWRlIjowLCJsb25naXR1ZGUiOjAsImNpdHkiOiIifQ=="}}`,
 			rec.Body.String(),
 		)
 	}
