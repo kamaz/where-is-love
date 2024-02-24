@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/kamaz/where-is-love/types"
 	"github.com/labstack/echo"
 )
 
@@ -36,22 +37,21 @@ type UserResult struct {
 //	        "age": <integer>
 //	    }
 //	}
-type UserEndpoint struct {
+type userEndpoint struct {
 	repository  UserRepository
 	middlewares []echo.MiddlewareFunc
 }
 
-func CreateUserEndpoint(repo UserRepository) *UserEndpoint {
-	return &UserEndpoint{
+func CreateUserEndpoint(repo UserRepository) types.Endpoint {
+	return &userEndpoint{
 		repository: repo,
 	}
 }
 
-func (u *UserEndpoint) Process(e echo.Context) error {
+func (u *userEndpoint) Process(e echo.Context) error {
 	user, err := u.repository.CreateUser(e.Request().Context())
-	// check if there is an log and mask error
 	if err != nil {
-		return fmt.Errorf("failed to create user")
+		return fmt.Errorf("failed to create user %w", err)
 	}
 	userResponse := UserResponse(*user)
 	result := UserResult{Result: &userResponse}
@@ -60,14 +60,14 @@ func (u *UserEndpoint) Process(e echo.Context) error {
 	return nil
 }
 
-func (u *UserEndpoint) Method() string {
+func (u *userEndpoint) Method() string {
 	return "POST"
 }
 
-func (u *UserEndpoint) Path() string {
+func (u *userEndpoint) Path() string {
 	return "/user/create"
 }
 
-func (u *UserEndpoint) Middlewares() []echo.MiddlewareFunc {
+func (u *userEndpoint) Middlewares() []echo.MiddlewareFunc {
 	return u.middlewares
 }

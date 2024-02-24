@@ -1,7 +1,9 @@
-DROP INDEX user_pref_from_to_id_idx;
-DROP TABLE user_preference;
+DROP INDEX user_match_from_to_id_idx;
+DROP TABLE user_match;
 DROP INDEX app_user_email_idx;
 DROP INDEX app_user_email_pwd_idx;
 DROP TABLE app_user; 
-DROP TYPE gender;
-DROP TYPE preference;
+DROP TYPE gender_type;
+DROP TYPE preference_type;
+DROP EXTENSION earthdistance;
+DROP EXTENSION cube; 

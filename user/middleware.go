@@ -10,7 +10,6 @@ import (
 const UserKey = "user"
 
 // ServerHeader middleware adds a `Server` header to the response.
-// todo: introduce a common error handling
 func AppAuthorization(tg TokenGenerator) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {

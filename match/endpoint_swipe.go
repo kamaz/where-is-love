@@ -1,6 +1,7 @@
 package match
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/kamaz/where-is-love/user"
@@ -27,8 +28,8 @@ Note: matchID must only be included if matched is true.
 func CreateSwipeEndpoint(
 	repo MatchRepository,
 	middlewares ...echo.MiddlewareFunc,
-) *SwipeEndpoint {
-	return &SwipeEndpoint{
+) *swipeEndpoint {
+	return &swipeEndpoint{
 		repository:  repo,
 		middlewares: middlewares,
 	}
@@ -50,15 +51,15 @@ type SwipeResult struct {
 	Result *SwipeResponse `json:"result"`
 }
 
-type SwipeEndpoint struct {
+type swipeEndpoint struct {
 	middlewares []echo.MiddlewareFunc
 	repository  MatchRepository
 }
 
-func (u *SwipeEndpoint) Process(e echo.Context) error {
+func (u *swipeEndpoint) Process(e echo.Context) error {
 	var swipeRequest SwipeRequest
 	if err := e.Bind(&swipeRequest); err != nil {
-		return err
+		return fmt.Errorf("failed to read payload %w", err)
 	}
 
 	ctx := e.Request().Context()
@@ -68,12 +69,16 @@ func (u *SwipeEndpoint) Process(e echo.Context) error {
 	// for simplicity we will just DB to throw error but ideally we would have
 	// some validation
 	matchCriteria, err := toCreateMatchCriteria(user.Id, &swipeRequest)
-	_, err = u.repository.CreatePreference(ctx, matchCriteria)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create match %w", err)
 	}
 
-	matchResult, err := u.repository.FindPreference(
+	myPreference, err := u.repository.CreatePreference(ctx, matchCriteria)
+	if err != nil {
+		return fmt.Errorf("failed to create preference %w", err)
+	}
+
+	datePreference, err := u.repository.FindPreference(
 		ctx,
 		&MatchPreferenceCriteria{
 			UserId:     swipeRequest.UserId,
@@ -82,24 +87,24 @@ func (u *SwipeEndpoint) Process(e echo.Context) error {
 		},
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to find preference %w", err)
 	}
 
-	response := toSwipeResponse(matchResult)
+	response := toSwipeResponse(myPreference, datePreference)
 
 	result := SwipeResult{Result: response}
 	e.JSON(http.StatusOK, result)
 	return nil
 }
 
-func (u *SwipeEndpoint) Method() string {
+func (u *swipeEndpoint) Method() string {
 	return "POST"
 }
 
-func (u *SwipeEndpoint) Path() string {
+func (u *swipeEndpoint) Path() string {
 	return "/swipe"
 }
 
-func (u *SwipeEndpoint) Middlewares() []echo.MiddlewareFunc {
+func (u *swipeEndpoint) Middlewares() []echo.MiddlewareFunc {
 	return u.middlewares
 }

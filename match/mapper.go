@@ -9,7 +9,7 @@ var ErrInvalidPreference = errors.New("invalid preference")
 
 const (
 	PreferenceYes = "YES"
-	PreferenceNo  = "No"
+	PreferenceNo  = "NO"
 )
 
 func toCreateMatchCriteria(userId uint, match *SwipeRequest) (*MatchPreferenceCriteria, error) {
@@ -24,12 +24,12 @@ func toCreateMatchCriteria(userId uint, match *SwipeRequest) (*MatchPreferenceCr
 	return criteria, nil
 }
 
-func toSwipeResponse(preference *MatchPreferenceEntity) *SwipeResponse {
+func toSwipeResponse(myPreference, datePreference *MatchPreferenceEntity) *SwipeResponse {
 	response := &SwipeResponse{}
 
-	if preference.Preference == PreferenceYes {
+	if myPreference.Preference == PreferenceYes && datePreference.Preference == PreferenceYes {
 		response.Matched = true
-		response.MatchId = preference.FromId
+		response.MatchId = datePreference.FromId
 	}
 
 	return response

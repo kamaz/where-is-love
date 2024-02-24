@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-var _ TokenGenerator = (*SimpleTokenGenerator)(nil)
+var _ TokenGenerator = (*simpleTokenGenerator)(nil)
 
 type UserToken struct {
 	Id        uint    `json:"id"`
@@ -38,12 +38,16 @@ type TokenGenerator interface {
 	Validate(token string) (*UserToken, error)
 }
 
-// SimpleTokenGenerator is a simple token generator
+func CreateTokenGenerator() TokenGenerator {
+	return &simpleTokenGenerator{}
+}
+
+// simpleTokenGenerator is a simple token generator
 // which uses a json to marshal and unmarshal the user entity
 // and then convert the generated string to base64.
-type SimpleTokenGenerator struct{}
+type simpleTokenGenerator struct{}
 
-func (t *SimpleTokenGenerator) Generate(user *UserToken) (string, error) {
+func (t *simpleTokenGenerator) Generate(user *UserToken) (string, error) {
 	userContent, err := json.Marshal(user)
 	if err != nil {
 		return "", fmt.Errorf("failed to marshal user: %w", err)
@@ -52,7 +56,7 @@ func (t *SimpleTokenGenerator) Generate(user *UserToken) (string, error) {
 	return base64.StdEncoding.EncodeToString(userContent), nil
 }
 
-func (t *SimpleTokenGenerator) Validate(token string) (*UserToken, error) {
+func (t *simpleTokenGenerator) Validate(token string) (*UserToken, error) {
 	decoded, err := base64.StdEncoding.DecodeString(token)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode token: %w", err)

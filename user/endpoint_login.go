@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/kamaz/where-is-love/types"
 	"github.com/labstack/echo"
 )
 
@@ -27,20 +28,20 @@ type LoginResult struct {
 	Result *LoginResponse `json:"result"`
 }
 
-type LoginEndpoint struct {
+type loginEndpoint struct {
 	repository     UserRepository
 	tokenGenerator TokenGenerator
 	middlewares    []echo.MiddlewareFunc
 }
 
-func CreateLoginEndpoint(repo UserRepository, tokenGenerator TokenGenerator) *LoginEndpoint {
-	return &LoginEndpoint{
+func CreateLoginEndpoint(repo UserRepository, tokenGenerator TokenGenerator) types.Endpoint {
+	return &loginEndpoint{
 		repository:     repo,
 		tokenGenerator: tokenGenerator,
 	}
 }
 
-func (u *LoginEndpoint) Process(e echo.Context) error {
+func (u *loginEndpoint) Process(e echo.Context) error {
 	var request LoginRequest
 	if err := e.Bind(&request); err != nil {
 		return fmt.Errorf("failed to bind payload %w", err)
@@ -72,14 +73,14 @@ func (u *LoginEndpoint) Process(e echo.Context) error {
 	return nil
 }
 
-func (u *LoginEndpoint) Method() string {
+func (u *loginEndpoint) Method() string {
 	return "POST"
 }
 
-func (u *LoginEndpoint) Path() string {
+func (u *loginEndpoint) Path() string {
 	return "/login"
 }
 
-func (u *LoginEndpoint) Middlewares() []echo.MiddlewareFunc {
+func (u *loginEndpoint) Middlewares() []echo.MiddlewareFunc {
 	return u.middlewares
 }

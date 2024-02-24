@@ -16,7 +16,7 @@ func TestCreateUser(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	h := UserEndpoint{repository: &MockUserRepository{}}
+	h := userEndpoint{repository: &mockUserRepository{}}
 
 	if assert.NoError(h.Process(c)) {
 		assert.Equal(http.StatusCreated, rec.Code)

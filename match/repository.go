@@ -3,10 +3,11 @@ package match
 import "context"
 
 var (
-	_ MatchRepository = (*SQLMatchRepository)(nil)
-	_ MatchRepository = (*MockMatchRepository)(nil)
+	_ MatchRepository = (*sqlMatchRepository)(nil)
+	_ MatchRepository = (*mockMatchRepository)(nil)
 )
 
+// MatchEntity represents a match entity
 type MatchEntity struct {
 	Id             uint
 	Name           string
@@ -15,6 +16,7 @@ type MatchEntity struct {
 	DistanceFromMe uint
 }
 
+// MatchCriteria represents criteria for getting matches
 type MatchCriteria struct {
 	UserId    uint
 	Longitude float64
@@ -23,12 +25,14 @@ type MatchCriteria struct {
 	Gender    string
 }
 
+// MatchPreferenceEntity represents a match preference entity between two users and their preference 'YES' and 'NO'
 type MatchPreferenceEntity struct {
 	FromId     uint
 	ToId       uint
 	Preference string
 }
 
+// MatchPreferenceCriteria represents criteria for creating and finding match preference
 type MatchPreferenceCriteria struct {
 	UserId  uint
 	MatchId uint
@@ -36,11 +40,13 @@ type MatchPreferenceCriteria struct {
 	Preference string
 }
 
+// Sort represents sorting criteria
 type Sort struct {
 	Property string
 	Asc      bool
 }
 
+// MatchRepository is an interface for match repository
 type MatchRepository interface {
 	FindMatches(context.Context, *MatchCriteria, *Sort) ([]*MatchEntity, error)
 	CreatePreference(context.Context, *MatchPreferenceCriteria) (*MatchPreferenceEntity, error)

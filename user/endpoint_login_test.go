@@ -19,7 +19,7 @@ func TestLogin(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	h := LoginEndpoint{repository: &MockUserRepository{}, tokenGenerator: &SimpleTokenGenerator{}}
+	h := loginEndpoint{repository: &mockUserRepository{}, tokenGenerator: &simpleTokenGenerator{}}
 
 	if assert.NoError(h.Process(c)) {
 		assert.Equal(http.StatusOK, rec.Code)

@@ -29,8 +29,7 @@ func main() {
 		close(stopper)
 	}()
 
-	// todo: configure enviornment variables
-	token := &user.SimpleTokenGenerator{}
+	token := user.CreateTokenGenerator()
 	authMiddleware := user.AppAuthorization(token)
 	matchRepo := match.CreateSQLMatchRepository(dbpool)
 	server := server.CreateServer(5000,

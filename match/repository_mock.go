@@ -5,13 +5,18 @@ import (
 	"strconv"
 )
 
-type MockMatchRepository struct {
+type mockMatchRepository struct {
 	users map[uint]*MatchPreferenceEntity
 }
 
-func CreateMockMatchRepository() *MockMatchRepository {
-	return &MockMatchRepository{
+func CreateMockMatchRepository() *mockMatchRepository {
+	return &mockMatchRepository{
 		users: map[uint]*MatchPreferenceEntity{
+			1: {
+				FromId:     2,
+				ToId:       1,
+				Preference: "YES",
+			},
 			2: {
 				FromId:     2,
 				ToId:       1,
@@ -26,7 +31,7 @@ func CreateMockMatchRepository() *MockMatchRepository {
 	}
 }
 
-func (u *MockMatchRepository) FindMatches(
+func (u *mockMatchRepository) FindMatches(
 	ctx context.Context,
 	criteria *MatchCriteria,
 	sort *Sort,
@@ -74,14 +79,14 @@ func (u *MockMatchRepository) FindMatches(
 	return finalResult, nil
 }
 
-func (u *MockMatchRepository) CreatePreference(
+func (u *mockMatchRepository) CreatePreference(
 	ctx context.Context,
 	criteria *MatchPreferenceCriteria,
 ) (*MatchPreferenceEntity, error) {
-	return nil, nil
+	return u.users[criteria.UserId], nil
 }
 
-func (u *MockMatchRepository) FindPreference(
+func (u *mockMatchRepository) FindPreference(
 	ctx context.Context,
 	criteria *MatchPreferenceCriteria,
 ) (*MatchPreferenceEntity, error) {

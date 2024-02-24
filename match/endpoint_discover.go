@@ -1,6 +1,7 @@
 package match
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/kamaz/where-is-love/user"
@@ -37,8 +38,8 @@ type MatchResult struct {
 func CreateDiscoverEndpoint(
 	repo MatchRepository,
 	middlewares ...echo.MiddlewareFunc,
-) *DiscoverEndpoint {
-	return &DiscoverEndpoint{
+) *discoverEndpoint {
+	return &discoverEndpoint{
 		repository:  repo,
 		middlewares: middlewares,
 	}
@@ -52,12 +53,12 @@ type MatchResponse struct {
 	DistanceFromMe uint   `json:"distanceFromMe"`
 }
 
-type DiscoverEndpoint struct {
+type discoverEndpoint struct {
 	repository  MatchRepository
 	middlewares []echo.MiddlewareFunc
 }
 
-func (u *DiscoverEndpoint) Process(e echo.Context) error {
+func (u *discoverEndpoint) Process(e echo.Context) error {
 	user := e.Request().Context().Value(user.UserKey).(*user.UserToken)
 	age := e.QueryParam("age")
 	gender := e.QueryParam("gender")
@@ -74,7 +75,7 @@ func (u *DiscoverEndpoint) Process(e echo.Context) error {
 		toSort(sort),
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to find matches %w", err)
 	}
 
 	results := []*MatchResponse{}
@@ -87,14 +88,14 @@ func (u *DiscoverEndpoint) Process(e echo.Context) error {
 	return nil
 }
 
-func (u *DiscoverEndpoint) Method() string {
+func (u *discoverEndpoint) Method() string {
 	return "GET"
 }
 
-func (u *DiscoverEndpoint) Path() string {
+func (u *discoverEndpoint) Path() string {
 	return "/discover"
 }
 
-func (u *DiscoverEndpoint) Middlewares() []echo.MiddlewareFunc {
+func (u *discoverEndpoint) Middlewares() []echo.MiddlewareFunc {
 	return u.middlewares
 }

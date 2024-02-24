@@ -2,59 +2,75 @@
 
 `Where is love` is revolutionary `api` which allows you to find a friend to meet and chat and hopefully get in `love`.
 
-## No no no
+## 💔 fix
 
-- [ ] Password is not encrypted
-- [ ] Logging format and definition
+- [ ] Switch token usage from `base64` to `JWT`.
+- [ ] Encrypt passwords.
+- [ ] Standardise logging format and definition.
+- [ ] Unify error handling.
+- [ ] Create a configuration file for easy application setup.
+- [ ] Separate DB and search functionality to enhance query efficiency.
+- [ ] Enable logging.
+- [ ] Distinguish between `test` and `integration test`. Currently, the application must be running to execute `go test ./...`.
+- [ ] Expand documentation.
+- [ ] Improve module separation.
+- [ ] Implement auditing and monitoring capabilities.
+- [ ] Set up CI/CD.
+- [ ] Create an `openapi` specification and generate client to enhance integration test readability, instead of using base types.
+- [ ] Hide internal errors from user
 
-## Architecture decisions
+## 🏗️ Architecture decisions
 
-- Split the application based on the bounded context like `user`, `discovery` and `swipe`
-- Because this is test application keeping separating of contexts
-- Logging
-- Monitoring
-- Because there is not much logic keeping it in the `endpoint` in real implementation that would be in some service
-- `postgres` being used as search engine which is not optimal
-
-## Future improvements
-
-- [ ] `test` directory is being used for integration tests and application has to be up and running
-- [ ] migrate authentication to `jwt` token
-- [ ] think about further splitting `bounded context`s to enable better module separation
-- [ ] more documentation
-- [ ] create `openapi` specification and generate client to improve integration test readability instead of using base types
+- Split the application based on bounded contexts such as `user` and `match`.
+- The `user` context allows creating a user and logging in (ideally, this would support OIDC).
+- The `match` context enables discovering matches and swiping on people we like.
+- Minimal business logic within `endpoints`.
+- Use `Postgres` as a single DB, which may not be optimal, especially when adding search functionality. A search engine might be a better solution.
+- Distribute data across bounded contexts.
 
 ## Prerequisite
 
 1. [Docker](https://docs.docker.com/engine/install/)
-2. [go](https://go.dev/doc/install)
-
-You have to use `golang` +1.22.
+2. [go](https://go.dev/doc/install) version 1.22 or higher.
 
 ## How to start app 
 
-Before starting you have to setup the database to do that execute following:
+First, set up the database by executing the following command:
 
 ```shell
 docker compose --profile tools run db-up
 ```
 
-After running the command you can just start application by running:
+Then, start the application with:
 
 ```shell
 docker compose up
 ```
 
+After the migration is applied and the application is running, run the full set of tests to ensure everything works correctly:
+
+Note: Since users and data are generated randomly, an integration test may fail on the initial run (low probability, but possible). If this happens, simply rerun the test.
+
+```shell
+go test -count 1 ./...
+```
+
 ## Other commands
 
-To remove all the migration script you can just run following command:
+To remove all migration scripts, run the following command:
 
 ```shell
 docker compose --profile tools run db-down
 ```
 
-To zzzvlogin to db and sniff around you can just do following:
+To log in to the database:
 
 ```shell
 docker compose exec db psql -U postgres -d postgres -W
+```
+
+To clean up and remove all images:
+
+```shell
+docker compose down --remove-orphans --rmi all -v
 ```

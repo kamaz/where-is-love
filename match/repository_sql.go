@@ -11,10 +11,10 @@ import (
 )
 
 func CreateSQLMatchRepository(pool *pgxpool.Pool) MatchRepository {
-	return &SQLMatchRepository{db: pool}
+	return &sqlMatchRepository{db: pool}
 }
 
-type SQLMatchRepository struct {
+type sqlMatchRepository struct {
 	db *pgxpool.Pool
 }
 
@@ -22,7 +22,7 @@ type SQLMatchRepository struct {
 // Exclude profiles you’ve already swiped on.
 // select * app_user join swipes on
 
-func (u *SQLMatchRepository) createQueryAndParams(
+func (u *sqlMatchRepository) createQueryAndParams(
 	criteria *MatchCriteria,
 	sort *Sort,
 ) (string, []any) {
@@ -52,7 +52,7 @@ func (u *SQLMatchRepository) createQueryAndParams(
 	query := fmt.Sprintf(
 		"SELECT id, name, gender, age, earth_distance(ll_to_earth(latitude, longitude), ll_to_earth($2, $3))::integer/1000 AS distance_in_kilometers"+ // select
 			" FROM app_user "+ // from
-			" WHERE id != $1 %s AND id NOT IN (SELECT to_id FROM user_preference WHERE from_id = $1)"+ // where
+			" WHERE id != $1 %s AND id NOT IN (SELECT to_id FROM user_match WHERE from_id = $1)"+ // where
 			" %s", // orderBy
 		strings.Join(filters, " "),
 		orderBy,
@@ -63,7 +63,7 @@ func (u *SQLMatchRepository) createQueryAndParams(
 
 // matches
 // { gender, age  }
-func (u *SQLMatchRepository) FindMatches(
+func (u *sqlMatchRepository) FindMatches(
 	ctx context.Context,
 	criteria *MatchCriteria,
 	sort *Sort,
@@ -96,13 +96,13 @@ func (u *SQLMatchRepository) FindMatches(
 	return matches, nil
 }
 
-func (u *SQLMatchRepository) CreatePreference(
+func (u *sqlMatchRepository) CreatePreference(
 	ctx context.Context,
 	criteria *MatchPreferenceCriteria,
 ) (*MatchPreferenceEntity, error) {
 	_, err := u.db.Exec(
 		ctx,
-		"INSERT INTO user_preference(from_id, to_id, preference) VALUES ($1, $2, $3)",
+		"INSERT INTO user_match(from_id, to_id, preference) VALUES ($1, $2, $3)",
 		criteria.UserId,
 		criteria.MatchId,
 		criteria.Preference,
@@ -118,14 +118,14 @@ func (u *SQLMatchRepository) CreatePreference(
 	}, nil
 }
 
-func (u *SQLMatchRepository) FindPreference(
+func (u *sqlMatchRepository) FindPreference(
 	ctx context.Context,
 	criteria *MatchPreferenceCriteria,
 ) (*MatchPreferenceEntity, error) {
 	var preference MatchPreferenceEntity
 	err := u.db.QueryRow(
 		ctx,
-		"SELECT from_id, to_id, preference FROM user_preference WHERE from_id = $1 AND to_id = $2 AND preference = $3",
+		"SELECT from_id, to_id, preference FROM user_match WHERE from_id = $1 AND to_id = $2 AND preference = $3",
 		criteria.UserId,
 		criteria.MatchId,
 		criteria.Preference,

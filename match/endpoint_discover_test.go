@@ -19,8 +19,8 @@ func TestDiscover(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	h := DiscoverEndpoint{
-		repository: &MockMatchRepository{},
+	h := discoverEndpoint{
+		repository: &mockMatchRepository{},
 	}
 
 	if assert.NoError(h.Process(c)) {
@@ -40,8 +40,8 @@ func TestDiscoverWithGenderFilter(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	h := DiscoverEndpoint{
-		repository: &MockMatchRepository{},
+	h := discoverEndpoint{
+		repository: &mockMatchRepository{},
 	}
 
 	if assert.NoError(h.Process(c)) {
@@ -61,8 +61,8 @@ func TestDiscoverWithAgeFilter(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	h := DiscoverEndpoint{
-		repository: &MockMatchRepository{},
+	h := discoverEndpoint{
+		repository: &mockMatchRepository{},
 	}
 
 	if assert.NoError(h.Process(c)) {
@@ -82,8 +82,8 @@ func TestDiscoverWithAgeAndGenderFilters(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	h := DiscoverEndpoint{
-		repository: &MockMatchRepository{},
+	h := discoverEndpoint{
+		repository: &mockMatchRepository{},
 	}
 
 	if assert.NoError(h.Process(c)) {

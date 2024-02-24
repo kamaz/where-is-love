@@ -11,15 +11,15 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type SQLUserRepository struct {
+type sqlUserRepository struct {
 	db *pgxpool.Pool
 }
 
-func CreateSQLUserRepository(pool *pgxpool.Pool) *SQLUserRepository {
-	return &SQLUserRepository{db: pool}
+func CreateSQLUserRepository(pool *pgxpool.Pool) *sqlUserRepository {
+	return &sqlUserRepository{db: pool}
 }
 
-func (u *SQLUserRepository) CreateUser(ctx context.Context) (*UserEntity, error) {
+func (u *sqlUserRepository) CreateUser(ctx context.Context) (*UserEntity, error) {
 	now := time.Now().UnixNano()
 
 	gender := "male"
@@ -87,7 +87,7 @@ func (u *SQLUserRepository) CreateUser(ctx context.Context) (*UserEntity, error)
 	return user, nil
 }
 
-func (u *SQLUserRepository) GetUserByEmailAndPassword(
+func (u *sqlUserRepository) GetUserByEmailAndPassword(
 	ctx context.Context,
 	criteria *EmailAndPasswordCriteria,
 ) (*UserEntity, error) {

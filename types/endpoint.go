@@ -9,6 +9,3 @@ type Endpoint interface {
 	Path() string
 	Middlewares() []echo.MiddlewareFunc
 }
-
-// todo: Return an appropriate error if login fails.
-// todo: Ensure that all other endpoints are appropriately authenticated.

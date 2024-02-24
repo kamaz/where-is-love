@@ -3,13 +3,13 @@ package user
 import "context"
 
 // verity that the repository implements the interface
-type MockUserRepository struct{}
+type mockUserRepository struct{}
 
-func CreateMockUserRepository() *MockUserRepository {
-	return &MockUserRepository{}
+func CreateMockUserRepository() *mockUserRepository {
+	return &mockUserRepository{}
 }
 
-func (m *MockUserRepository) CreateUser(
+func (m *mockUserRepository) CreateUser(
 	ctx context.Context,
 ) (*UserEntity, error) {
 	return &UserEntity{
@@ -22,7 +22,7 @@ func (m *MockUserRepository) CreateUser(
 	}, nil
 }
 
-func (m *MockUserRepository) GetUserByEmailAndPassword(
+func (m *mockUserRepository) GetUserByEmailAndPassword(
 	ctx context.Context,
 	criteria *EmailAndPasswordCriteria,
 ) (*UserEntity, error) {

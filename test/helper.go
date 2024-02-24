@@ -139,3 +139,12 @@ func createUserEndpoint(assert *assert.Assertions) map[string]any {
 	assert.NotNil(user["password"])
 	return user
 }
+
+func createFewUsers(assert *assert.Assertions) []map[string]any {
+	users := []map[string]any{}
+	for range 10 {
+		user := createUserEndpoint(assert)
+		users = append(users, user)
+	}
+	return users
+}

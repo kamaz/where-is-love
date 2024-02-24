@@ -11,6 +11,11 @@ services:
       - app
     volumes:
       - db:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   api:
     build:
@@ -21,7 +26,8 @@ services:
     ports:
       - 5000:5000
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - app
     volumes:
@@ -33,19 +39,21 @@ services:
     entrypoint: 'migrate -database postgresql://postgres:postgres@db/postgres?sslmode=disable -path /tmp/migrations'
     command: up
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - app
     volumes:
       - ./data/db:/tmp/migrations
 
-  db-drop: &basemigrate
+  db-down: &basemigrate
     profiles: ['tools']
     image: migrate/migrate
     entrypoint: 'migrate -database postgresql://postgres:postgres@db/postgres?sslmode=disable -path /tmp/migrations'
     command: down
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - app
     volumes:

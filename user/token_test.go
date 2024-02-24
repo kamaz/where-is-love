@@ -8,7 +8,7 @@ import (
 
 func TestGenerateToken_GeneratedAndValidates(t *testing.T) {
 	assert := assert.New(t)
-	tokenGenerator := &SimpleTokenGenerator{}
+	tokenGenerator := &simpleTokenGenerator{}
 
 	user := &UserToken{
 		Id:     1,
@@ -28,7 +28,7 @@ func TestGenerateToken_GeneratedAndValidates(t *testing.T) {
 
 func TestGenerateToken_FailsValidation(t *testing.T) {
 	assert := assert.New(t)
-	tokenGenerator := &SimpleTokenGenerator{}
+	tokenGenerator := &simpleTokenGenerator{}
 
 	user, err := tokenGenerator.Validate("eyJlY2hvIjoiaGVsbG8ifQo=")
 
@@ -38,7 +38,7 @@ func TestGenerateToken_FailsValidation(t *testing.T) {
 
 func TestGenerateToken_Validation_Errors_NonJSON(t *testing.T) {
 	assert := assert.New(t)
-	tokenGenerator := &SimpleTokenGenerator{}
+	tokenGenerator := &simpleTokenGenerator{}
 
 	user, err := tokenGenerator.Validate("ZWNobwo=")
 
